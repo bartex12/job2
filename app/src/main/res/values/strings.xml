@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MapLesson1</string>
+    <string name="google_maps_key">AIzaSyDx7johUefeuSV__zH6wssIvDkmL0QOJks</string>
+    <string name="menu_map_location">Я здесь</string>
+    <string name="menu_map_point_new">Начальная точка</string>
+    <string name="menu_map_mode">Тип карты</string>
+    <string name="menu_map_mode_normal">По умолчанию</string>
+    <string name="menu_map_mode_satellite">Спутник</string>
+    <string name="menu_map_mode_terrain">Рельеф</string>
+</resources>
