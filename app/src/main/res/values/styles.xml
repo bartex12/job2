@@ -2,4 +2,29 @@
 <resources>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="TextInputEditTextStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:inputType">text</item>
+    </style>
+
+    <style name="CardStyle" >
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">@dimen/layout_margin_8dp</item>
+        <item name="android:layout_marginTop">@dimen/layout_margin_4dp</item>
+        <item name="android:layout_marginEnd">@dimen/layout_margin_8dp</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="cardCornerRadius">@dimen/layout_margin_4dp</item>
+        <item name="elevation">@dimen/layout_margin_4dp</item>
+    </style>
+
+    <style name="MyListItemStyle" >
+        <item name="android:textSize">@dimen/tv_size_middle</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">?colorPrimaryDark</item>
+    </style>
 </resources>

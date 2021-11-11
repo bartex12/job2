@@ -8,18 +8,25 @@
         android:icon="@drawable/ic_baseline_my_location_24"
         app:showAsAction="ifRoom"
         tools:ignore="AppCompatResource" />
-            <item android:id="@+id/menu_map_mode_satellite"
-                android:showAsAction="never"
-                android:title="@string/menu_map_mode_satellite"
-                tools:ignore="AppCompatResource" />
 
-            <item android:id="@+id/menu_map_mode_terrain"
-                android:showAsAction="never"
-                android:title="@string/menu_map_mode_terrain"
-                tools:ignore="AppCompatResource" />
+    <item android:id="@+id/menu_map_list"
+        android:title="@string/menu_list_markers"
+        android:icon="@drawable/ic_baseline_list_24"
+        app:showAsAction="ifRoom"
+        tools:ignore="AppCompatResource" />
 
-            <item android:id="@+id/menu_map_mode_default"
-                android:showAsAction="never"
-                android:title="@string/menu_map_mode_normal"
-                tools:ignore="AppCompatResource" />
+    <item android:id="@+id/menu_map_mode_satellite"
+        android:showAsAction="never"
+        android:title="@string/menu_map_mode_satellite"
+        tools:ignore="AppCompatResource" />
+
+    <item android:id="@+id/menu_map_mode_terrain"
+        android:showAsAction="never"
+        android:title="@string/menu_map_mode_terrain"
+        tools:ignore="AppCompatResource" />
+
+    <item android:id="@+id/menu_map_mode_default"
+        android:showAsAction="never"
+        android:title="@string/menu_map_mode_normal"
+        tools:ignore="AppCompatResource" />
 </menu>

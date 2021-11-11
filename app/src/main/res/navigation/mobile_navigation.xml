@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/mobile_navigation"
+    app:startDestination="@id/mapFragment">
+
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.bartex.maplesson1.view.fragments.MapFragment"
+        android:label="MapFragment" />
+    <dialog
+        android:id="@+id/markerDialog"
+        android:name="com.bartex.maplesson1.view.dialogs.MarkerDialog"
+        android:label="MarkerDialog" />
+    <fragment
+        android:id="@+id/newMarkerFragment"
+        android:name="com.bartex.maplesson1.view.fragments.NewMarkerFragment"
+        android:label="MarkerFragment" />
+    <fragment
+        android:id="@+id/listOfMarkersFragment"
+        android:name="com.bartex.maplesson1.view.fragments.MarkersFragment"
+        android:label="ListOfMarkersFragment" />
+</navigation>

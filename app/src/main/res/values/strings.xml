@@ -7,4 +7,17 @@
     <string name="menu_map_mode_normal">По умолчанию</string>
     <string name="menu_map_mode_satellite">Спутник</string>
     <string name="menu_map_mode_terrain">Рельеф</string>
+
+    <string name="title">Заголовок</string>
+    <string name="snippet">Краткое описание</string>
+    <string name="help_title">Название маркера</string>
+    <string name="help_snippet">Описание местоположения</string>
+    <string name="latitude">Широта</string>
+    <string name="longitude">Долгота</string>
+    <string name="help_latitude">Широта в точке установки маркера</string>
+    <string name="help_longitude">Долгота в точке установки маркера</string>
+    <string name="addMarker">Добавить маркер</string>
+    <string name="menu_list_markers">Список маркеров</string>
+    <string name="no_data_state_test">Пока нет данных</string>
+    <string name="noData">Пока нет ни одного маркера</string>
 </resources>
