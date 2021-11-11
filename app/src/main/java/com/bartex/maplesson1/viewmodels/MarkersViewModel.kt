@@ -50,6 +50,6 @@ class MarkersViewModel(
     }
 
     companion object{
-        const val TAG = "33333"
+        const val TAG = "MarkersViewModel"
     }
 }

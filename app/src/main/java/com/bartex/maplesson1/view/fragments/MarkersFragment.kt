@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -14,15 +15,13 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bartex.maplesson1.R
+import com.bartex.maplesson1.model.Constants
 import com.bartex.maplesson1.model.MarkerData
 import com.bartex.maplesson1.view.adapters.MapRecyclerAdapter
 import com.bartex.maplesson1.viewmodels.MarkersViewModel
 
 class MarkersFragment:Fragment() {
 
-    companion object{
-        const val TAG = "33333"
-    }
     lateinit var viewModelMarkers: MarkersViewModel
     private var adapter: MapRecyclerAdapter? = null
     private var listOfMarkers = listOf<MarkerData>()
@@ -41,14 +40,21 @@ class MarkersFragment:Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initViews(view)
+        loadListOfMarkers()
+        initAdapter()
+    }
+
+    private fun initViews(view: View) {
         navController = Navigation.findNavController(view)
         viewModelMarkers = ViewModelProvider(this).get(MarkersViewModel::class.java)
         rvMap = view.findViewById(R.id.rv_map)
         emptyViewMarkers = view.findViewById(R.id.empty_view_markers)
+    }
 
+    private fun loadListOfMarkers() {
         viewModelMarkers.loadData().observe(viewLifecycleOwner, Observer { list->
-            Log.d(TAG, "MapFragment onViewCreated вкладка со списком " )
-           listOfMarkers = list.map { room->
+            listOfMarkers = list.map { room->
                 MarkerData(
                     id =room.id, latitude = room.latitude, longitude = room.longitude,
                     title = room.title, snippet = room.snippet
@@ -56,7 +62,6 @@ class MarkersFragment:Fragment() {
             }
             renderData(listOfMarkers)
         })
-        initAdapter()
     }
 
     private fun renderData(listOfMarkers: List<MarkerData>) {
@@ -75,8 +80,18 @@ class MarkersFragment:Fragment() {
 
     private fun  initAdapter(){
         rvMap.layoutManager = LinearLayoutManager(requireActivity())
-        adapter =MapRecyclerAdapter()
+        adapter = MapRecyclerAdapter(getOnMarkerListener())
         rvMap.adapter = adapter
     }
 
+    private fun getOnMarkerListener(): MapRecyclerAdapter.OnMarkerClickListener {
+    return object :MapRecyclerAdapter.OnMarkerClickListener{
+        override fun onMarkerClick(markerData: MarkerData) {
+            val bundle = bundleOf(Constants.LAT to markerData.latitude,
+                Constants.LON to markerData.longitude)
+            navController.popBackStack()
+            navController.navigate(R.id.mapFragment, bundle)
+        }
+    }
+    }
 }

@@ -20,4 +20,5 @@
     <string name="menu_list_markers">Список маркеров</string>
     <string name="no_data_state_test">Пока нет данных</string>
     <string name="noData">Пока нет ни одного маркера</string>
+    <string name="menu_map_description">Моё местоположение</string>
 </resources>

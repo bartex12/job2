@@ -12,7 +12,7 @@ class RoomMarkerData (
         @PrimaryKey val id: String = "-1",
         val latitude:Double = 0.0,
         val longitude:Double = 0.0,
-        val title:String = "",
-        val snippet:String = "",
+        val title:String = "Новая точка",
+        val snippet:String = "Без описания",
         val isMyPlace :String = "0"
 )

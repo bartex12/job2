@@ -12,11 +12,24 @@ import com.bartex.maplesson1.R
 
 class MainActivity : AppCompatActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // сначала получаем разрешения на определение местоположения
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ), 100)
+        }
         setContentView(R.layout.activity_main)
+        initToolbar()
+    }
 
+    private fun initToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar_maps)
         //поддержка экшенбара
         setSupportActionBar(toolbar)
@@ -28,18 +41,6 @@ class MainActivity : AppCompatActivity() {
             setTextColor(Color.WHITE)
             text = context.getString(R.string.app_name)
         }
-
-        //получаем разрешения на определение местоположения
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
-            != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ), 100)
-        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int,
@@ -50,7 +51,9 @@ class MainActivity : AppCompatActivity() {
             val permissionsGranted =
                     (grantResults.size > 1 && grantResults[1] == PackageManager.PERMISSION_GRANTED
                             && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            if (permissionsGranted) recreate()
+            if (permissionsGranted) {
+                recreate() //если разрешения получены- перезагрузка
+            }
         }
     }
 }

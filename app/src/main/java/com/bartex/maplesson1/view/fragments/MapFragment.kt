@@ -1,11 +1,14 @@
 package com.bartex.maplesson1.view.fragments
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.app.ActivityCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -27,29 +30,16 @@ import java.util.*
 
 class MapFragment:Fragment(), OnMapReadyCallback {
 
-    companion object{
-        const val DIALOG_FRAGMENT = "DIALOG_FRAGMENT"
-        const val TAG = "33333"
-    }
     private lateinit var googleMap: GoogleMap
     private val mLocManager by lazy{
         requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
     private var isHere = false
-    private var lat = 0.0 //широта
-    private var lon = 0.0 // долгота
-    var target: LatLng = LatLng(0.0, 0.0) //координаты целевой точки
+    private var target: LatLng = LatLng(0.0, 0.0) //координаты целевой точки
     private lateinit var navController: NavController
     private var listOfMarkers = listOf<MarkerData>()
     lateinit var viewModelMarkers: MarkersViewModel
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?. let {
-            lat = it.getDouble(Constants.LAT)
-            lon = it.getDouble(Constants.LON)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -62,30 +52,57 @@ class MapFragment:Fragment(), OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        navController = Navigation.findNavController(view)
-        viewModelMarkers = ViewModelProvider(this).get(MarkersViewModel::class.java)
-
-        // грузим Google Map object
-        val mapFragment =  childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
-
+        initViews(view)
+        initGoogleMap()
         setHasOptionsMenu(true)
-        requireActivity().invalidateOptionsMenu()
     }
 
-    @SuppressLint("MissingPermission")
+    private fun initViews(view: View) {
+        navController = Navigation.findNavController(view)
+        viewModelMarkers = ViewModelProvider(this).get(MarkersViewModel::class.java)
+    }
+
+    // грузим Google Map object
+    private fun initGoogleMap() {
+        val mapFragment =  childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+    }
+
+    //колбэк когда карта готова
     override fun onMapReady(p0: GoogleMap) {
         this.googleMap = p0
-        googleMap.isMyLocationEnabled = true
+        if (ActivityCompat.checkSelfPermission(requireActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(requireActivity(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                requireActivity(), arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ), 100)
+        }else{
+            //эта строка требовала разрешений
+            googleMap.isMyLocationEnabled = true
+
+            initMapPArams()
+            getListOfMarkers()
+            //getArgumentsWithData()
+            initOnMapListener()
+        }
+    }
+
+    private fun initMapPArams() {
         //не показывать кнопку моё место - будет своя
         googleMap.uiSettings.isMyLocationButtonEnabled = false
         // кнопка управления масштабом
         googleMap.uiSettings.isZoomControlsEnabled = true
-        //выбираем вид со спутника
+        //выбираем обычный вид  карты
         googleMap.mapType = GoogleMap.MAP_TYPE_NORMAL
+    }
 
+    private fun getListOfMarkers() {
         viewModelMarkers.loadData().observe(viewLifecycleOwner, Observer { list->
-            Log.d(MarkersFragment.TAG, "MapFragment onViewCreated вкладка со списком " )
             listOfMarkers = list.map { room->
                 MarkerData(
                     id =room.id, latitude = room.latitude, longitude = room.longitude,
@@ -94,51 +111,38 @@ class MapFragment:Fragment(), OnMapReadyCallback {
             }
             renderData(listOfMarkers)
         })
-
-        arguments?. let {
-            //получаем место из аргументов
-            lat = it.getDouble(Constants.LAT)
-            lon = it.getDouble(Constants.LON)
-            target = LatLng(lat, lon)
-            moveCamera(target, 5f)
-        }
-            googleMap.setOnMapClickListener {
-                //запоминаем
-                lat = it.latitude
-                lon = it.longitude
-               val bundle = bundleOf(Constants.LAT to lat, Constants.LON to lon) //так проще
-                  navController.navigate(R.id.markerDialog, bundle)
-            }
     }
 
-    //если список пуст - определяем местоположение, ставим точку на карте, пишем в базу,перемещаемся в точку
-    //если список не пуст -
+    private fun initOnMapListener() {
+        googleMap.setOnMapClickListener {
+            val bundle = bundleOf(Constants.LAT to it.latitude, Constants.LON to it.longitude) //так проще
+            navController.navigate(R.id.markerDialog, bundle)
+        }
+    }
+
     private fun renderData(listOfMarkers: List<MarkerData>) {
         //получаем место расположения устройства
         target = getMyLatLon()
-
+        //если список пуст - определяем местоположение, ставим точку на карте,
+        // пишем в базу,перемещаемся   в точку
         if (listOfMarkers.isEmpty()){
-            //запоминаем для передачи в диалог
-           // lat = target.latitude
-            //lon = target.longitude
             //ставим целевую точку на карте
-            val marker =  googleMap.addMarker(
+            googleMap.addMarker(
                 MarkerOptions()
                     .position(target) //координаты
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)) //цвет
-                    .snippet("Моё местоположение")
-                    .title("Я здесь") //заголовок
+                    .snippet(getString(R.string.menu_map_description))
+                    .title(getString(R.string.menu_map_location)) //заголовок
             )
             //пишем в базу
             viewModelMarkers.addMarkerInRoom(MarkerData(id = UUID.randomUUID().toString(),
                 latitude = target.latitude, longitude = target.longitude,
-                title = "Я здесь", snippet ="Моё местоположение", isMyPlace = "1" ))
-
+                title = getString(R.string.menu_map_location),
+                snippet =getString(R.string.menu_map_description), isMyPlace = "1" ))
             //перемещаемся в точку расположения устройства с zoom = 5
             moveCamera(target, 5f)
 
-            Log.d(TAG, "onMapReady:  ${marker?.position?.latitude} " +
-                    " ${marker?.position?.longitude} ${marker?.title} ${marker?.snippet}")
+            //если список не пуст -ставим на карте все маркеры и идём в точку первого маркера
         }else{
             val markers = arrayOfNulls<MarkerOptions>(listOfMarkers.size)
             for (i in listOfMarkers.indices) {
@@ -150,8 +154,16 @@ class MapFragment:Fragment(), OnMapReadyCallback {
                     googleMap.addMarker(it)
                 }
             }
-            target = LatLng(listOfMarkers[0].latitude, listOfMarkers[0].longitude)
-            moveCamera(target, 5f)
+            if(arguments == null){
+                target = LatLng(listOfMarkers[0].latitude, listOfMarkers[0].longitude)
+                moveCamera(target, 5f)
+            }else{
+                //получаем место из аргументов
+                target = LatLng(
+                    requireArguments().getDouble(Constants.LAT),
+                    requireArguments().getDouble(Constants.LON))
+                moveCamera(target, 5f)
+            }
         }
     }
 
@@ -173,12 +185,10 @@ class MapFragment:Fragment(), OnMapReadyCallback {
                 return true
             }
             R.id.menu_map_location -> {
-//                viewModelMarkers.updateMarkerInRoom(MarkerData(id = UUID.randomUUID().toString(),
-//                    latitude = target.latitude, longitude = target.longitude,
-//                    title = "Я здесь", snippet ="Моё местоположение", isMyPlace = "1" ))
                 moveCameraToMyLocation()
             }
             R.id.menu_map_list ->{
+                navController.popBackStack()
                 navController.navigate(R.id.listOfMarkersFragment)
             }
         }
@@ -214,5 +224,4 @@ class MapFragment:Fragment(), OnMapReadyCallback {
         }
         isHere = !isHere
     }
-
 }
